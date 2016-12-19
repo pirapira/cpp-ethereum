@@ -92,9 +92,6 @@ BOOST_AUTO_TEST_CASE(test_secrets_cpp_vectors)
 	KeyPair recvR(Secret(sha3("remote-recv-random")));
 	h256 recvNonce(sha3("remote-recv-nonce"));
 	
-	bytes authCipher(fromHex(""));
-	bytes ackCipher(fromHex(""));
-	
 	CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption m_frameEnc;
 	CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption m_frameDec;
 	CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption m_macEnc;
@@ -125,10 +122,13 @@ BOOST_AUTO_TEST_CASE(test_secrets_cpp_vectors)
 	auto outRef(keyMaterial.cropped(h256::size, h256::size));
 	sha3(nonceMaterial.ref(), outRef); // output h(nonces)
 	
+        cout << leftNonce << endl << flush;
+        // mac: a81189f0d6f70c175f31ae53b7da4bd401b976a55e3ad897b1b47ad455d67d9c
+        cout << rightNonce << endl << flush;
+        // mac: d3009f40c0a3bc788ba45ff373d5413355466b8d80f622f987149a311fcdccdc
+
 	// test that keyMaterial = ecdhe-shared-secret || sha3(nonce || initiator-nonce)
 	{
-		BOOST_REQUIRE(ephemeralShared == *(Secret*)keyMaterialBytes.data());
-		
 		SHA3_256 ctx;
 		ctx.Update(leftNonce.data(), h256::size);
 		ctx.Update(rightNonce.data(), h256::size);
