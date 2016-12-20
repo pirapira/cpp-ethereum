@@ -148,6 +148,9 @@ BOOST_AUTO_TEST_CASE(test_secrets_cpp_vectors)
 // linux: 63c0d80400d8da86e15729255541fd7fa92ca1e550ed4a2f542defc91dbe04bd
 // mac: 189ccb86e6da3a5c083a062efc23cc9b7e08d72963c00a795e7db2f7fb2a7353
 
+		cout << CRYPTOPP_VERSION << endl << flush;
+// linux: 562
+
 	}
 }
 
