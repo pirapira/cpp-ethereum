@@ -54,12 +54,17 @@ void ClientTest::setChainParams(string const& _genesis)
 	ChainParams params;
 	try
 	{
+		std::cout << "setChainParams in somewhere" << endl << flush;
 		params = params.loadConfig(_genesis);
+		std::cout << "params set" << endl << flush;
 		if (params.sealEngineName != "NoProof")
 			BOOST_THROW_EXCEPTION(ChainParamsNotNoProof() << errinfo_comment("Provided configuration is not well formatted."));
 
+		std::cout << "reopen" << endl << flush;
 		reopenChain(params, WithExisting::Kill);
+		std::cout << "reopened" << endl << flush;
 		setAuthor(params.author); //for some reason author is not being set
+		std::cout << "author set" << endl << flush;
 	}
 	catch (...)
 	{

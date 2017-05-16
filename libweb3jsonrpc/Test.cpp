@@ -38,11 +38,15 @@ bool Test::test_setChainParams(Json::Value const& param1)
 	try
 	{
 		Json::FastWriter fastWriter;
+		cout << "fastWriter created" << endl << flush;
 		std::string output = fastWriter.write(param1);
+		cout << "output found" << endl << flush;
 		asClientTest(m_eth).setChainParams(output);
+		cout << "setChainParmas done" << endl << flush;
 	}
 	catch (std::exception const&)
 	{
+		cout << "on this line" << endl << flush;
 		BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INTERNAL_ERROR));
 	}
 

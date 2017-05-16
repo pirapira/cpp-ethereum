@@ -374,7 +374,11 @@ namespace json_spirit
     template< class Config >
     bool Value_impl< Config >::get_bool() const
     {
+		std::cout << "get_bool()" << std::endl << std::flush;
+
         check_type(  bool_type );
+
+		std::cout << "get_bool(): checked type" << std::endl << std::flush;
 
         return boost::get< bool >( v_ );
     }

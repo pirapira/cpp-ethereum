@@ -58,6 +58,8 @@ ChainParams ChainParams::loadConfig(string const& _json, h256 const& _stateRoot)
 	json_spirit::read_string(_json, val);
 	js::mObject obj = val.get_obj();
 
+    cout << "some initial loadconfig" << endl << flush;
+
 	cp.sealEngineName = obj["sealEngine"].get_str();
 	// params
 	js::mObject params = obj["params"].get_obj();
@@ -65,17 +67,35 @@ ChainParams ChainParams::loadConfig(string const& _json, h256 const& _stateRoot)
 	cp.maximumExtraDataSize = u256(fromBigEndian<u256>(fromHex(params["maximumExtraDataSize"].get_str())));
 	cp.tieBreakingGas = params.count("tieBreakingGas") ? params["tieBreakingGas"].get_bool() : true;
 	cp.blockReward = u256(fromBigEndian<u256>(fromHex(params["blockReward"].get_str())));
+
+    cout << "entering for loop" << endl << flush;
+
 	for (auto i: params)
 	{
+		cout << "  for loop... another item" << endl << flush;
 		if (i.first != "accountStartNonce" && i.first != "maximumExtraDataSize" &&
 			i.first != "blockReward" && i.first != "tieBreakingGas" && i.first != "allowFutureBlocks")
+		{
+			cout << "  for loop... another item...then" << endl << flush;
 			cp.otherParams[i.first] = i.second.get_str();
+		}
 		else
 		{
+			cout << "  for loop... another item...else" << endl << flush;
+			cout << "  with i.first..." << i.first << endl << flush;
 			if (i.first == "allowFutureBlocks")
-				cp.otherParams[i.first] = i.second.get_bool();
+			{
+				cout << "  for loop... another item...else...allowF..." << i.second.get_str() << endl << flush; // because it is str type... OK, string "1"
+				auto v = i.second.get_bool();
+				cout << "  for loop... another item...else...allowF...right" << endl << flush;
+				cp.otherParams[i.first] = v;
+				cout << "  for loop... another item...else...allowF...assign" << endl << flush;
+			}
+			cout << "  for loop... another item...else...left allowF" << endl << flush;
 		}
 	}
+
+    cout << "finished for loop" << endl << flush;
 
 	// genesis
 	string genesisStr = json_spirit::write_string(obj["genesis"], false);
@@ -83,6 +103,9 @@ ChainParams ChainParams::loadConfig(string const& _json, h256 const& _stateRoot)
 	// genesis state
 	string genesisStateStr = json_spirit::write_string(obj["accounts"], false);
 	cp = cp.loadGenesisState(genesisStateStr, _stateRoot);
+
+    cout << "almost returning " << endl << flush;
+
 	return cp;
 }
 
