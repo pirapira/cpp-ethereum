@@ -149,12 +149,15 @@ int64_t call(
 		u256 gas = _msg->gas;
 		// ExtVM::create takes the sender address from .myAddress.
 		assert(fromEvmC(_msg->sender) == env.myAddress);
-		auto addr = env.create(value, gas, input, {});
+		h160 addr;
+		owning_bytes_ref revertOutput;
+		std::tie(addr, revertOutput) = env.create(value, gas, input, {});
 		auto gasLeft = static_cast<int64_t>(gas);
 		if (addr)
 			std::copy(addr.begin(), addr.end(), _outputData);
 		else
 			gasLeft |= EVM_CALL_FAILURE;
+
 		return gasLeft;
 	}
 

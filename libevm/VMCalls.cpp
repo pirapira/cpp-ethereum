@@ -130,7 +130,11 @@ void VM::caseCreate()
 		if (!m_schedule->staticCallDepthLimit())
 			createGas -= createGas / 64;
 		u256 gas = createGas;
-		m_SPP[0] = (u160)m_ext->create(endowment, gas, bytesConstRef(m_mem.data() + initOff, initSize), m_onOp);
+		h160 addr;
+		owning_bytes_ref revertOutput;
+		std::tie(addr, revertOutput) = m_ext->create(endowment, gas, bytesConstRef(m_mem.data() + initOff, initSize), m_onOp);
+		m_SPP[0] = (u160)addr;
+		m_returnData = revertOutput.toBytes();
 		*m_io_gas_p -= (createGas - gas);
 		m_io_gas = uint64_t(*m_io_gas_p);
 	}
