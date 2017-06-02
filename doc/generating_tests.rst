@@ -20,7 +20,8 @@ Generating a GeneralStateTest Case
 Designing a Test Case
 ---------------------
 
-For creating a new GeneralStateTest case, you need
+For creating a new GeneralStateTest case, you need:
+
 * something
   something
   something
