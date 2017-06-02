@@ -17,6 +17,21 @@ When you add a test case in the consensus test suite, you are supposed to push b
 Generating a GeneralStateTest Case
 ==================================
 
+Designing a Test Case
+---------------------
+
+For creating a new GeneralStateTest case, you need
+* something
+  something
+  something
+
+Converting a GeneralStateTest Case into a BlockchainTest Case
+=============================================================
+
+
+
 
 Generating a BlockchainTest Case
 ================================
+
+(To be described.)
