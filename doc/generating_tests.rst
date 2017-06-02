@@ -10,7 +10,7 @@ The test cases are distributed in the "filled" form, which contains, for example
 The filled test cases are usually not written by hand, but generated from "test filler" files.
 ``testeth`` executable in cpp-ethereum can convert test fillers into test cases.
 
-When you add a test case in the consensus test suite, you are supposed to push both the filler and the filled test cases into the ```tests`` repository`__.
+When you add a test case in the consensus test suite, you are supposed to push both the filler and the filled test cases into the `tests repository`__.
 
 .. _`Consensus tests`: https://github.com/ethereum/tests
 
@@ -42,7 +42,7 @@ Writing a Test Filler
 
 A new test filler needs to be alone in a new test filler file.  A single filler file is not supposed to contain multiple tests.  ``testeth`` tool still accepts multiple test fillers in a single test filler file, but this might change.
 
-In the tests repository, the test filler files for GeneralStateTests live under ``src/GeneralStateTestsFiller`` directory.
+In the ``tests`` repository, the test filler files for GeneralStateTests live under ``src/GeneralStateTestsFiller`` directory.
 The directory has many subdirectories.  You need to choose one of the subdirectories or create one.  The name of the filler file needs to end with ``Filler.json``.  For example, we might want to create a new directory ``src/GeneralStateTestsFiller/stReturnDataTest`` with a new filler file ``returndatacopy_initialFiller.json``.
 
 The easiest way to start is to copy an existing filler file.  The first thing to change is the name of the test in the beginning of the file. The name of the test should coincide with the file name except ``Filler.json``. For example, in the file we created above, the filler file contains the name of the test ``returndatacopy_initial``.  The overall structure of ``returndatacopy_initialFiller.json`` should be:
