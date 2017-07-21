@@ -1137,7 +1137,7 @@ int main(int argc, char** argv)
         auto ethFace = new rpc::Eth(*web3.ethereum(), *accountHolder.get());
         rpc::TestFace* testEth = nullptr;
         if (testingMode)
-            testEth = new rpc::Test(*web3.ethereum());
+            testEth = new rpc::Test(*web3.ethereum(), *accountHolder.get());
 
         jsonrpcIpcServer.reset(new FullServer(
             ethFace, new rpc::Net(web3),
