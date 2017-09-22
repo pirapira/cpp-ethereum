@@ -194,7 +194,7 @@ public:
 	std::string listenAddress() const { return m_tcpPublic.address().is_unspecified() ? "0.0.0.0" : m_tcpPublic.address().to_string(); }
 
 	/// Get the port we're listening on currently.
-	unsigned short listenPort() const { return std::max(0, m_listenPort); }
+	unsigned short listenPort() const { Guard l(x_listenPort); return std::max(0, m_listenPort); }
 
 	/// Serialise the set of known peers.
 	bytes saveNetwork() const;
@@ -296,6 +296,7 @@ private:
 	/// Interface addresses (private, public)
 	std::set<bi::address> m_ifAddresses;								///< Interface addresses.
 
+	mutable Mutex x_listenPort;
 	int m_listenPort = -1;												///< What port are we listening on. -1 means binding failed or acceptor hasn't been initialized.
 
 	ba::io_service m_ioService;											///< IOService for network stuff.

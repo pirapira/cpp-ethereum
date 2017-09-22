@@ -393,7 +393,7 @@ void Host::determinePublic()
 	bool listenIsPublic = lset && isPublicAddress(laddr);
 	bool publicIsHost = !lset && pset && ifAddresses.count(paddr);
 	
-	bi::tcp::endpoint ep(bi::address(), m_listenPort);
+	bi::tcp::endpoint ep(bi::address(), listenPort());
 	if (m_netPrefs.traverseNAT && listenIsPublic)
 	{
 		clog(NetNote) << "Listen address set to Public address:" << laddr << ". UPnP disabled.";
@@ -428,11 +428,17 @@ void Host::determinePublic()
 
 void Host::runAcceptor()
 {
-	assert(m_listenPort > 0);
+	{
+		Guard l(x_listenPort);
+		assert(m_listenPort > 0);
+	}
 
 	if (m_run && !m_accepting)
 	{
-		clog(NetConnect) << "Listening on local port " << m_listenPort << " (public: " << m_tcpPublic << ")";
+		{
+			Guard l(x_listenPort);
+			clog(NetConnect) << "Listening on local port " << m_listenPort << " (public: " << m_tcpPublic << ")";
+		}
 		m_accepting = true;
 
 		auto socket = make_shared<RLPXSocket>(m_ioService);
@@ -742,7 +748,10 @@ void Host::startedWorking()
 	int port = Network::tcp4Listen(m_tcp4Acceptor, m_netPrefs);
 	if (port > 0)
 	{
-		m_listenPort = port;
+		{
+			Guard l(x_listenPort);
+			m_listenPort = port;
+		}
 		determinePublic();
 		runAcceptor();
 	}
