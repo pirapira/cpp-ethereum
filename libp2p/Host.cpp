@@ -407,7 +407,7 @@ void Host::determinePublic()
 	else if (m_netPrefs.traverseNAT)
 	{
 		bi::address natIFAddr;
-		ep = Network::traverseNAT(lset && ifAddresses.count(laddr) ? std::set<bi::address>({laddr}) : ifAddresses, m_listenPort, natIFAddr);
+		ep = Network::traverseNAT(lset && ifAddresses.count(laddr) ? std::set<bi::address>({laddr}) : ifAddresses, listenPort(), natIFAddr);
 		
 		if (lset && natIFAddr != laddr)
 			// if listen address is set, Host will use it, even if upnp returns different
@@ -428,17 +428,11 @@ void Host::determinePublic()
 
 void Host::runAcceptor()
 {
-	{
-		Guard l(x_listenPort);
-		assert(m_listenPort > 0);
-	}
+	assert(listenPort() > 0);
 
 	if (m_run && !m_accepting)
 	{
-		{
-			Guard l(x_listenPort);
-			clog(NetConnect) << "Listening on local port " << m_listenPort << " (public: " << m_tcpPublic << ")";
-		}
+		clog(NetConnect) << "Listening on local port " << listenPort() << " (public: " << m_tcpPublic << ")";
 		m_accepting = true;
 
 		auto socket = make_shared<RLPXSocket>(m_ioService);
