@@ -31,6 +31,7 @@
 #include <libdevcore/RLP.h>
 #include <libdevcore/TrieHash.h>
 #include <libdevcore/FileSystem.h>
+#include <libdevcore/FixedHash.h>
 #include <libethcore/Exceptions.h>
 #include <libethcore/BlockHeader.h>
 
@@ -1211,8 +1212,11 @@ void BlockChain::garbageCollect(bool _force)
 			break;
 		}
 		case ExtraBlockHash:
-
-		// TODO: ExtraBlockHash seems missing.
+		{
+			WriteGuard l(x_blockHashes);
+			m_blockHashes.erase(static_cast<uint64_t>(FixedHash<32>::Arith(id.first)));
+			break;
+		}
 		case ExtraReceipts:
 		{
 			WriteGuard l(x_receipts);
