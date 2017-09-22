@@ -656,18 +656,21 @@ size_t Host::peerCount() const
 
 void Host::run(boost::system::error_code const&)
 {
-	if (!m_run)
 	{
-		// reset NodeTable
-		m_nodeTable.reset();
+		Guard l(x_runTimer);
+		if (!m_run)
+		{
+			// reset NodeTable
+			m_nodeTable.reset();
 
-		// stopping io service allows running manual network operations for shutdown
-		// and also stops blocking worker thread, allowing worker thread to exit
-		m_ioService.stop();
+			// stopping io service allows running manual network operations for shutdown
+			// and also stops blocking worker thread, allowing worker thread to exit
+			m_ioService.stop();
 
-		// resetting timer signals network that nothing else can be scheduled to run
-		m_timer.reset();
-		return;
+			// resetting timer signals network that nothing else can be scheduled to run
+			m_timer.reset();
+			return;
+		}
 	}
 
 	m_nodeTable->processEvents();
