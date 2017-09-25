@@ -226,6 +226,7 @@ void BlockChainSync::onPeerStatus(std::shared_ptr<EthereumPeer> _peer)
 
 void BlockChainSync::syncPeer(std::shared_ptr<EthereumPeer> _peer, bool _force)
 {
+	DEV_INVARIANT_CHECK;
 	if (_peer->m_asking != Asking::Nothing)
 	{
 		clog(NetAllDetail) << "Can't sync with this peer - outstanding asks.";
@@ -462,7 +463,7 @@ void BlockChainSync::onPeerBlockHeaders(std::shared_ptr<EthereumPeer> _peer, RLP
 		if (status == QueueStatus::Importing || status == QueueStatus::Ready || host().chain().isKnown(info.hash()))
 		{
 			m_haveCommonHeader = true;
-			m_lastImportedBlock = (unsigned)info.number();
+			m_lastImportedBlock = (unsigned)info.number(); // invariant can be broken
 			m_lastImportedBlockHash = info.hash();
 		}
 		else
@@ -579,7 +580,10 @@ void BlockChainSync::collectBlocks()
 	auto& headers = *m_headers.begin();
 	auto& bodies = *m_bodies.begin();
 	if (headers.first != bodies.first || headers.first != m_lastImportedBlock + 1)
+	{
+		cout << "skipping collection" << endl;
 		return;
+	}
 
 	unsigned success = 0;
 	unsigned future = 0;
@@ -608,6 +612,7 @@ void BlockChainSync::collectBlocks()
 		case ImportResult::Malformed:
 		case ImportResult::BadChain:
 			restartSync();
+			cout << "restart Sync" << endl;
 			return;
 
 		case ImportResult::FutureTimeKnown:
@@ -623,6 +628,7 @@ void BlockChainSync::collectBlocks()
 				resetSync();
 				m_haveCommonHeader = false; // fork detected, search for common header again
 			}
+			cout << "unknown result" << endl;
 			return;
 
 		default:;
@@ -644,7 +650,7 @@ void BlockChainSync::collectBlocks()
 	auto newBodies = std::move(bodies.second);
 	newBodies.erase(newBodies.begin(), newBodies.begin() + i);
 	unsigned newBodiesHead = bodies.first + i;
-	m_headers.erase(m_headers.begin());
+	m_headers.erase(m_headers.begin()); // what is the next thing? Are things queued in order?
 	m_bodies.erase(m_bodies.begin());
 	if (!newHeaders.empty())
 		m_headers[newHeaderHead] = newHeaders;
@@ -853,16 +859,34 @@ void BlockChainSync::onPeerAborting()
 bool BlockChainSync::invariants() const
 {
 	if (!isSyncing() && !m_headers.empty())
+	{
+		cout << "broken a" << endl;
 		BOOST_THROW_EXCEPTION(FailedInvariant() << errinfo_comment("Got headers while not syncing"));
+	}
 	if (!isSyncing() && !m_bodies.empty())
+	{
+		cout << "broken b" << endl;
 		BOOST_THROW_EXCEPTION(FailedInvariant() << errinfo_comment("Got bodies while not syncing"));
+	}
 	if (isSyncing() && m_host.chain().number() > 0 && m_haveCommonHeader && m_lastImportedBlock == 0)
+	{
+		cout << "broken c" << endl;
 		BOOST_THROW_EXCEPTION(FailedInvariant() << errinfo_comment("Common block not found"));
+	}
 	if (isSyncing() && !m_headers.empty() &&  m_lastImportedBlock >= m_headers.begin()->first)
+	{
+		cout << "broken d" << endl;
 		BOOST_THROW_EXCEPTION(FailedInvariant() << errinfo_comment("Header is too old"));
+	}
 	if (m_headerSyncPeers.empty() != m_downloadingHeaders.empty())
+	{
+		cout << "broken e" << endl;
 		BOOST_THROW_EXCEPTION(FailedInvariant() << errinfo_comment("Header download map mismatch"));
+	}
 	if (m_bodySyncPeers.empty() != m_downloadingBodies.empty() && m_downloadingBodies.size() <= m_headerIdToNumber.size())
+	{
+		cout << "broken f" << endl;
 		BOOST_THROW_EXCEPTION(FailedInvariant() << errinfo_comment("Body download map mismatch"));
+	}
 	return true;
 }
