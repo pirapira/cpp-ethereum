@@ -87,10 +87,6 @@ void Worker::startWorking()
 		}));
 //		cnote << "Spawning" << m_name;
 	}
-
-	DEV_TIMED_ABOVE("Start worker", 100)
-		while (m_state == WorkerState::Starting)
-			m_state_notifier.wait(l);
 }
 
 void Worker::stopWorking()

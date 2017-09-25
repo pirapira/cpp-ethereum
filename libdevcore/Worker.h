@@ -74,7 +74,13 @@ protected:
 	void stopWorking();
 
 	/// Returns if worker thread is present.
-	bool isWorking() const { Guard l(x_work); return m_state == WorkerState::Started; }
+	bool isWorking() const { return m_state == WorkerState::Started; }
+
+	/// Returns if still vptr table is in construction.
+	bool inConstructor() const { return m_state == WorkerState::Constructor; }
+	
+	/// Returns if still vptr table is in construction.
+	bool isStarting() const { return m_state == WorkerState::Starting; }
 	
 	/// Called after thread is started from startWorking().
 	virtual void startedWorking() {}
