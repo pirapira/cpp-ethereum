@@ -226,6 +226,8 @@ void BlockChainSync::onPeerStatus(std::shared_ptr<EthereumPeer> _peer)
 
 void BlockChainSync::syncPeer(std::shared_ptr<EthereumPeer> _peer, bool _force)
 {
+	RecursiveGuard l(x_sync);
+	DEV_INVARIANT_CHECK;
 	if (_peer->m_asking != Asking::Nothing)
 	{
 		clog(NetAllDetail) << "Can't sync with this peer - outstanding asks.";
