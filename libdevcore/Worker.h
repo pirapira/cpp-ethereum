@@ -38,6 +38,7 @@ enum class IfRunning
 
 enum class WorkerState
 {
+	Constructor,
 	Starting,
 	Started,
 	Stopping,
@@ -73,7 +74,13 @@ protected:
 	void stopWorking();
 
 	/// Returns if worker thread is present.
-	bool isWorking() const { Guard l(x_work); return m_state == WorkerState::Started; }
+	bool isWorking() const { return m_state == WorkerState::Started; }
+
+	/// Returns if still vptr table is in construction.
+	bool inConstructor() const { return m_state == WorkerState::Constructor; }
+	
+	/// Returns if still vptr table is in construction.
+	bool isStarting() const { return m_state == WorkerState::Starting; }
 	
 	/// Called after thread is started from startWorking().
 	virtual void startedWorking() {}
@@ -95,16 +102,20 @@ protected:
 	/// This has to be called in the destructor of any derived class.  Otherwise the worker thread will try to lookup vptrs.
 	void terminate();
 
+	/// Start threads.
+	/// This has to be called in the constructor of any most-derived class, to notify that vptr is ready.
+	void allowVprAccess();
+
 private:
 
 	std::string m_name;
 
 	unsigned m_idleWaitMs = 0;
 	
-	mutable Mutex x_work;						///< Lock for the network existance and m_state_notifier.
+	mutable Mutex x_work;						///< Lock for the network existance, m_state_notifier and vptr table.
 	std::unique_ptr<std::thread> m_work;		///< The network thread.
     mutable std::condition_variable m_state_notifier; //< Notification when m_state changes.
-	std::atomic<WorkerState> m_state = {WorkerState::Starting};
+	std::atomic<WorkerState> m_state = {WorkerState::Constructor};
 };
 
 }
