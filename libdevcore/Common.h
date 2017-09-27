@@ -309,19 +309,19 @@ uint64_t utcTime();
 namespace std
 {
 
-inline dev::WithExisting max(dev::WithExisting _a, dev::WithExisting _b)
-{
-	return static_cast<dev::WithExisting>(max(static_cast<int>(_a), static_cast<int>(_b)));
-}
+// inline dev::WithExisting max(dev::WithExisting _a, dev::WithExisting _b)
+// {
+// 	return static_cast<dev::WithExisting>(max(static_cast<int>(_a), static_cast<int>(_b)));
+// }
 
-template <> struct hash<dev::u256>
-{
-	size_t operator()(dev::u256 const& _a) const
-	{
-		unsigned size = _a.backend().size();
-		auto limbs = _a.backend().limbs();
-		return boost::hash_range(limbs, limbs + size);
-	}
-};
+// template <> struct hash<dev::u256>
+// {
+// 	size_t operator()(dev::u256 const& _a) const
+// 	{
+// 		unsigned size = _a.backend().size();
+// 		auto limbs = _a.backend().limbs();
+// 		return boost::hash_range(limbs, limbs + size);
+// 	}
+// };
 
 }
