@@ -331,14 +331,6 @@ inline std::set<T> operator+(std::set<T> const& _a, std::set<T> const& _b)
 }
 
 template <class A, class B>
-std::unordered_map<A, B>& operator+=(std::unordered_map<A, B>& _x, std::unordered_map<A, B> const& _y)
-{
-	for (auto const& i: _y)
-		_x.insert(i);
-	return _x;
-}
-
-template <class A, class B>
 std::unordered_map<A, B> operator+(std::unordered_map<A, B> const& _x, std::unordered_map<A, B> const& _y)
 {
 	std::unordered_map<A, B> ret(_x);
