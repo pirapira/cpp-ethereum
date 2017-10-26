@@ -23,7 +23,6 @@
 
 #include <libdevcore/Log.h>
 #include <libp2p/All.h>
-#include "WhisperHost.h"
 using namespace std;
 using namespace dev;
 using namespace dev::p2p;
