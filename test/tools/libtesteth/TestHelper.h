@@ -28,7 +28,6 @@
 #include <boost/progress.hpp>
 
 #include <libethashseal/Ethash.h>
-#include <libethereum/State.h>
 #include <libethashseal/GenesisInfo.h>
 #include <test/tools/libtestutils/Common.h>
 
@@ -44,7 +43,6 @@ namespace eth
 {
 
 class Client;
-class State;
 
 void mine(Client& c, int numBlocks);
 void connectClients(Client& c1, Client& c2);
@@ -58,13 +56,6 @@ namespace test
 struct ValueTooLarge: virtual Exception {};
 struct MissingFields : virtual Exception {};
 bigint const c_max256plus1 = bigint(1) << 256;
-
-class ZeroGasPricer: public eth::GasPricer
-{
-protected:
-	u256 ask(eth::Block const&) const override { return 0; }
-	u256 bid(eth::TransactionPriority = eth::TransactionPriority::Medium) const override { return 0; }
-};
 
 // helping functions
 std::string prepareVersionString();
@@ -105,9 +96,6 @@ dev::eth::BlockHeader constructHeader(
 	bytes const& _extraData);
 void updateEthashSeal(dev::eth::BlockHeader& _header, h256 const& _mixHash, dev::eth::Nonce const& _nonce);
 RLPStream createRLPStreamFromTransactionFields(json_spirit::mObject const& _tObj);
-json_spirit::mObject fillJsonWithStateChange(eth::State const& _stateOrig, eth::State const& _statePost, eth::ChangeLog const& _changeLog);
-json_spirit::mObject fillJsonWithState(eth::State const& _state);
-json_spirit::mObject fillJsonWithState(eth::State const& _state, eth::AccountMaskMap const& _map);
 json_spirit::mObject fillJsonWithTransaction(eth::Transaction const& _txn);
 
 //Fill Test Functions
