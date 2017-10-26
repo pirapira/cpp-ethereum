@@ -20,7 +20,6 @@
 #include "Instruction.h"
 
 #include <libethcore/BlockHeader.h>
-#include <libethcore/ChainOperationParams.h>
 #include <libethcore/Common.h>
 #include <libethcore/LogEntry.h>
 #include <libdevcore/Common.h>
@@ -221,9 +220,6 @@ public:
 
 	/// Get the execution environment information.
 	EnvInfo const& envInfo() const { return m_envInfo; }
-
-	/// Return the EVM gas-price schedule for this execution context.
-	virtual EVMSchedule const& evmSchedule() const { return DefaultSchedule; }
 
 private:
 	EnvInfo const& m_envInfo;

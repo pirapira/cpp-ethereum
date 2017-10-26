@@ -105,21 +105,6 @@ Options::Options(int argc, char** argv)
 			printVersion();
 			exit(0);
 		}
-		else if (arg == "--vm")
-		{
-			throwIfNoArgumentFollows();
-			string vmKind = argv[++i];
-			if (vmKind == "interpreter")
-				VMFactory::setKind(VMKind::Interpreter);
-			else if (vmKind == "jit")
-				VMFactory::setKind(VMKind::JIT);
-			else if (vmKind == "smart")
-				VMFactory::setKind(VMKind::Smart);
-			else
-				cerr << "Unknown VM kind: " << vmKind << "\n";
-		}
-		else if (arg == "--jit") // TODO: Remove deprecated option "--jit"
-			VMFactory::setKind(VMKind::JIT);
 		else if (arg == "--vmtrace")
 		{
 #if ETH_VMTRACE
@@ -129,15 +114,6 @@ Options::Options(int argc, char** argv)
 			cerr << "--vmtrace option requires a build with cmake -DVMTRACE=1\n";
 			exit(1);
 #endif
-		}
-		else if (arg == "--jsontrace")
-		{
-			throwIfNoArgumentFollows();
-			jsontrace = true;
-			auto arg = std::string{argv[++i]};
-			Json::Value value;
-			Json::Reader().parse(arg, value);
-			jsontraceOptions = debugOptions(value);
 		}
 		else if (arg == "--filltests")
 			filltests = true;
@@ -174,12 +150,6 @@ Options::Options(int argc, char** argv)
 			}
 			else
 				singleTestName = std::move(name1);
-		}
-		else if (arg == "--singlenet")
-		{
-			throwIfNoArgumentFollows();
-			singleTestNet = std::string{argv[++i]};
-			ImportTest::checkAllowedNetwork({singleTestNet});
 		}
 		else if (arg == "--fulloutput")
 			fulloutput = true;
@@ -235,21 +205,6 @@ Options::Options(int argc, char** argv)
 		}
 		else if (arg == "--statediff")
 			statediff = true;
-		else if (arg == "--randomcode")
-		{
-			throwIfNoArgumentFollows();
-			int maxCodes = atoi(argv[++i]);
-			if (maxCodes > 1000 || maxCodes <= 0)
-			{
-				cerr << "Argument for the option is invalid! (use range: 1...1000)\n";
-				exit(1);
-			}
-			test::RandomCodeOptions options;
-			cout << test::RandomCode::get().generate(maxCodes, options) << "\n";
-			exit(0);
-		}
-		else if (arg == "--createRandomTest")
-			createRandomTest = true;
 		else if (seenSeparator)
 		{
 			cerr << "Unknown option: " + arg << "\n";

@@ -25,7 +25,6 @@
 
 using namespace std;
 using namespace dev;
-using namespace dev::eth;
 using namespace dev::test;
 
 namespace dev
@@ -62,56 +61,5 @@ std::string dev::test::getCommandLineArgument(string const& _name, bool _require
 	if (_require)
 		BOOST_ERROR("Failed getting command line argument: " << _name << " from: " << argv);
 	return "";
-}
-
-LoadTestFileFixture::LoadTestFileFixture()
-{
-	m_json = loadJsonFromFile(toTestFilePath(getCommandLineArgument("--eth_testfile")));
-}
-
-void ParallelFixture::enumerateThreads(std::function<void()> callback) const
-{
-	size_t threadsCount = std::stoul(getCommandLineArgument("--eth_threads"), nullptr, 10);
-	
-	std::vector<std::thread> workers;
-	for (size_t i = 0; i < threadsCount; i++)
-		workers.emplace_back(callback);
-
-	for (std::thread& t : workers)
-		t.join();
-}
-
-void BlockChainFixture::enumerateBlockchains(std::function<void(Json::Value const&, dev::eth::BlockChain const&, State state)> callback) const
-{
-	for (string const& name: m_json.getMemberNames())
-	{
-		BlockChainLoader bcl(m_json[name]);
-		callback(m_json[name], bcl.bc(), bcl.state());
-	}
-}
-
-void ClientBaseFixture::enumerateClients(std::function<void(Json::Value const&, dev::eth::ClientBase&)> callback) const
-{
-	enumerateBlockchains([&callback](Json::Value const& _json, BlockChain const& _bc, State _state) -> void
-	{
-		cerr << "void ClientBaseFixture::enumerateClients. FixedClient now accepts block not sate!" << endl;
-		_state.commit(State::CommitBehaviour::KeepEmptyAccounts); //unused variable. remove this line
-		eth::Block b(Block::Null);
-		b.noteChain(_bc);
-		FixedClient client(_bc, b);
-		callback(_json, client);
-	});
-}
-
-void ParallelClientBaseFixture::enumerateClients(std::function<void(Json::Value const&, dev::eth::ClientBase&)> callback) const
-{
-	ClientBaseFixture::enumerateClients([this, &callback](Json::Value const& _json, dev::eth::ClientBase& _client) -> void
-	{
-		// json is being copied here
-		enumerateThreads([callback, _json, &_client]() -> void
-		{
-			callback(_json, _client);
-		});
-	});
 }
 

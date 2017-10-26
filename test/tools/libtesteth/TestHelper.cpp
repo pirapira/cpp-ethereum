@@ -41,54 +41,6 @@ namespace dev
 namespace eth
 {
 
-void mine(Client& c, int numBlocks)
-{
-	auto startBlock = c.blockChain().details().number;
-
-	c.startSealing();
-	while(c.blockChain().details().number < startBlock + numBlocks)
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	c.stopSealing();
-}
-
-void connectClients(Client& c1, Client& c2)
-{
-	(void)c1;
-	(void)c2;
-	// TODO: Move to WebThree. eth::Client no longer handles networking.
-#if 0
-	short c1Port = 20000;
-	short c2Port = 21000;
-	c1.startNetwork(c1Port);
-	c2.startNetwork(c2Port);
-	c2.connect("127.0.0.1", c1Port);
-#endif
-}
-
-void mine(Block& s, BlockChain const& _bc, SealEngineFace* _sealer)
-{
-	EthashCPUMiner::setNumInstances(1);
-	s.commitToSeal(_bc, s.info().extraData());
-	Notified<bytes> sealed;
-	_sealer->onSealGenerated([&](bytes const& sealedHeader){ sealed = sealedHeader; });
-	_sealer->generateSeal(s.info());
-	sealed.waitNot({});
-	_sealer->onSealGenerated([](bytes const&){});
-	s.sealBlock(sealed);
-}
-
-void mine(BlockHeader& _bi, SealEngineFace* _sealer, bool _verify)
-{
-	Notified<bytes> sealed;
-	_sealer->onSealGenerated([&](bytes const& sealedHeader){ sealed = sealedHeader; });
-	_sealer->generateSeal(_bi);
-	sealed.waitNot({});
-	_sealer->onSealGenerated([](bytes const&){});
-	_bi = BlockHeader(sealed, HeaderData);
-//	cdebug << "Block mined" << Ethash::boundary(_bi).hex() << Ethash::nonce(_bi) << _bi.hash(WithoutSeal).hex();
-	if (_verify) //sometimes it is needed to mine incorrect blockheaders for testing
-		_sealer->verify(JustSeal, _bi);
-}
 
 }
 

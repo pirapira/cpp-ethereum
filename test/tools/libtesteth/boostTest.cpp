@@ -35,17 +35,6 @@ static std::ostringstream strCout;
 std::streambuf* oldCoutStreamBuf;
 std::streambuf* oldCerrStreamBuf;
 
-void createRandomTestWrapper()
-{
-	//restore output for creating test
-	std::cout.rdbuf(oldCoutStreamBuf);
-	std::cerr.rdbuf(oldCerrStreamBuf);
-
-	if (!dev::test::createRandomTest())
-		throw framework::internal_error("Create random test error! See std::error for more details.");
-
-	exit(0);
-}
 
 static std::atomic_bool stopTravisOut;
 void travisOut()
@@ -91,31 +80,6 @@ int main( int argc, char* argv[] )
 	try
 	{
 		//Initialize options
-		dev::test::Options const& opt = dev::test::Options::get(argc, argv);
-		if (opt.createRandomTest)
-		{
-			// Disable initial output as the random test will output valid json to std
-			oldCoutStreamBuf = std::cout.rdbuf();
-			oldCerrStreamBuf = std::cerr.rdbuf();
-			std::cout.rdbuf(strCout.rdbuf());
-			std::cerr.rdbuf(strCout.rdbuf());
-
-			for (int i = 0; i < argc; i++)
-			{
-				//replace test suite to random tests
-				std::string arg = std::string{argv[i]};
-				if (arg == "-t" && i+1 < argc)
-				{
-					argv[i + 1] = (char*)dynamicTestSuiteName.c_str();
-					break;
-				}
-			}
-
-			//add random tests suite
-			test_suite* ts1 = BOOST_TEST_SUITE("RandomTestCreationSuite");
-			ts1->add(BOOST_TEST_CASE(&createRandomTestWrapper));
-			framework::master_test_suite().add(ts1);
-		}
 	}
 	catch (dev::test::Options::InvalidOption const& e)
 	{

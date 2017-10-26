@@ -27,7 +27,6 @@
 #include <libdevcore/SHA3.h>
 #include <libdevcore/Guards.h>
 #include "Common.h"
-#include "ChainOperationParams.h"
 #include "Exceptions.h"
 
 namespace dev

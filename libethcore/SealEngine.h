@@ -72,27 +72,13 @@ public:
 	virtual void onSealGenerated(std::function<void(bytes const& s)> const& _f) = 0;
 	virtual void cancelGeneration() {}
 
-	ChainOperationParams const& chainParams() const { return m_params; }
-	void setChainParams(ChainOperationParams const& _params) { m_params = _params; }
-	SealEngineFace* withChainParams(ChainOperationParams const& _params) { setChainParams(_params); return this; }
-	virtual EVMSchedule const& evmSchedule(u256 const& _blockNumber) const = 0;
 	virtual u256 blockReward(u256 const& _blockNumber) const = 0;
 
-	virtual bool isPrecompiled(Address const& _a, u256 const& _blockNumber) const
-	{
-		return m_params.precompiled.count(_a) != 0 && _blockNumber >= m_params.precompiled.at(_a).startingBlock();
-	}
-	virtual bigint costOfPrecompiled(Address const& _a, bytesConstRef _in, u256 const&) const { return m_params.precompiled.at(_a).cost(_in); }
-	virtual std::pair<bool, bytes> executePrecompiled(Address const& _a, bytesConstRef _in, u256 const&) const { return m_params.precompiled.at(_a).execute(_in); }
-
-protected:
 	virtual bool onOptionChanging(std::string const&, bytes const&) { return true; }
 
 private:
 	mutable Mutex x_options;
 	std::unordered_map<std::string, bytes> m_options;
-
-	ChainOperationParams m_params;
 };
 
 class SealEngineBase: public SealEngineFace
@@ -106,8 +92,6 @@ public:
 			m_onSealGenerated(ret.out());
 	}
 	void onSealGenerated(std::function<void(bytes const&)> const& _f) override { m_onSealGenerated = _f; }
-	EVMSchedule const& evmSchedule(u256 const& _blockNumber) const override;
-	u256 blockReward(u256 const& _blockNumber) const override;
 
 protected:
 	std::function<void(bytes const& s)> m_onSealGenerated;
@@ -122,9 +106,6 @@ public:
 	/// unless you *know* that the params contain all information regarding the seal on the Genesis block.
 	static SealEngineFace* create(ChainOperationParams const& _params);
 	static SealEngineFace* create(std::string const& _name) { if (!get()->m_sealEngines.count(_name)) return nullptr; return get()->m_sealEngines[_name](); }
-
-	template <class SealEngine> static SealEngineFactory registerSealEngine(std::string const& _name) { return (get()->m_sealEngines[_name] = [](){return new SealEngine;}); }
-	static void unregisterSealEngine(std::string const& _name) { get()->m_sealEngines.erase(_name); }
 
 private:
 	static SealEngineRegistrar* get() { if (!s_this) s_this = new SealEngineRegistrar; return s_this; }
