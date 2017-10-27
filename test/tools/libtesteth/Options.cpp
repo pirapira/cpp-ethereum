@@ -100,7 +100,7 @@ Options::Options(int argc, char** argv)
 			printHelp();
 			exit(0);
 		}
-		else if (arg == "--version")
+		else if (arg == "--version" || arg == "--custom-version")
 		{
 			printVersion();
 			exit(0);

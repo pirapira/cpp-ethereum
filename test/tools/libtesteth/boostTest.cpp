@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <test/tools/libtesteth/TestHelper.h>
+#include <cryptopp/config.h>
 
 using namespace boost::unit_test;
 
@@ -42,6 +43,7 @@ void travisOut()
 	int tickCounter = 0;
 	while (!stopTravisOut)
 	{
+		std::cout << "CRYPTOPP_VERSION: " << CRYPTOPP_VERSION << "\n";
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		++tickCounter;
 		if (tickCounter % 10 == 0)
@@ -79,6 +81,7 @@ int main( int argc, char* argv[] )
 	setDefaultOrCLocale();
 	try
 	{
+		std::cout << "CRYPTOPP_VERSION: " << CRYPTOPP_VERSION << "\n";
 		//Initialize options
 	}
 	catch (dev::test::Options::InvalidOption const& e)
