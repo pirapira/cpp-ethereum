@@ -131,15 +131,6 @@ std::vector<eth::Network> const& getNetworks()
 	return networks;
 }
 
-std::string exportLog(eth::LogEntries const& _logs)
-{
-	RLPStream s;
-	s.appendList(_logs.size());
-	for (LogEntry const& l: _logs)
-		l.streamRLP(s);
-	return toHexPrefixed(sha3(s.out()));
-}
-
 u256 toInt(json_spirit::mValue const& _v)
 {
 	switch (_v.type())
@@ -296,26 +287,6 @@ bytes importCode(json_spirit::mObject const& _o)
 	return code;
 }
 
-LogEntries importLog(json_spirit::mArray const& _a)
-{
-	LogEntries logEntries;
-	for (auto const& l: _a)
-	{
-		json_spirit::mObject o = l.get_obj();
-		BOOST_REQUIRE(o.count("address") > 0);
-		BOOST_REQUIRE(o.count("topics") > 0);
-		BOOST_REQUIRE(o.count("data") > 0);
-		BOOST_REQUIRE(o.count("bloom") > 0);
-		LogEntry log;
-		log.address = Address(o.at("address").get_str());
-		for (auto const& t: o.at("topics").get_array())
-			log.topics.push_back(h256(t.get_str()));
-		log.data = importData(o);
-		logEntries.push_back(log);
-	}
-	return logEntries;
-}
-
 void checkOutput(bytesConstRef _output, json_spirit::mObject const& _o)
 {
 	int j = 0;
@@ -355,19 +326,6 @@ void checkStorage(map<u256, u256> const& _expectedStore, map<u256, u256> const& 
 	{
 		if (!_expectedStore.count(resultStorePair.first))
 			BOOST_ERROR(_expectedAddr << ": unexpected store key " << resultStorePair.first);
-	}
-}
-
-void checkCallCreates(eth::Transactions const& _resultCallCreates, eth::Transactions const& _expectedCallCreates)
-{
-	BOOST_REQUIRE_EQUAL(_resultCallCreates.size(), _expectedCallCreates.size());
-
-	for (size_t i = 0; i < _resultCallCreates.size(); ++i)
-	{
-		BOOST_CHECK(_resultCallCreates[i].data() == _expectedCallCreates[i].data());
-		BOOST_CHECK(_resultCallCreates[i].receiveAddress() == _expectedCallCreates[i].receiveAddress());
-		BOOST_CHECK(_resultCallCreates[i].gas() == _expectedCallCreates[i].gas());
-		BOOST_CHECK(_resultCallCreates[i].value() == _expectedCallCreates[i].value());
 	}
 }
 

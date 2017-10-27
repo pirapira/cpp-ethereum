@@ -106,21 +106,6 @@ BOOST_AUTO_TEST_CASE(KeyPairMix)
 	BOOST_CHECK_EQUAL(k.pub(), test);
 }
 
-BOOST_AUTO_TEST_CASE(keypairs)
-{
-	KeyPair p(Secret(fromHex("3ecb44df2159c26e0f995712d4f39b6f6e499b40749b1cf1246c37f9516cb6a4")));
-	BOOST_REQUIRE(p.pub() == Public(fromHex("97466f2b32bc3bb76d4741ae51cd1d8578b48d3f1e68da206d47321aec267ce78549b514e4453d74ef11b0cd5e4e4c364effddac8b51bcfc8de80682f952896f")));
-	BOOST_REQUIRE(p.address() == Address(fromHex("8a40bfaa73256b60764c1bf40675a99083efb075")));
-	eth::Transaction t(1000, 0, 0, h160(fromHex("944400f4b88ac9589a0f17ed4671da26bddb668b")), {}, 0, p.secret());
-	auto rlp = t.rlp(eth::WithoutSignature);
-	auto expectedRlp = "dc80808094944400f4b88ac9589a0f17ed4671da26bddb668b8203e880";
-	BOOST_CHECK_EQUAL(toHex(rlp), expectedRlp);
-	rlp = t.rlp(eth::WithSignature);
-	auto expectedRlp2 = "f85f80808094944400f4b88ac9589a0f17ed4671da26bddb668b8203e8801ca0bd2402a510c9c9afddf2a3f63c869573bd257475bea91d6f164638134a3386d6a0609ad9775fd2715e6a359c627e9338478e4adba65dd0dc6ef2bcbe6398378984";
-	BOOST_CHECK_EQUAL(toHex(rlp), expectedRlp2);
-	BOOST_CHECK_EQUAL(t.sender(), p.address());
-}
-
 BOOST_AUTO_TEST_CASE(KeyPairVerifySecret)
 {
 	auto keyPair = KeyPair::create();
