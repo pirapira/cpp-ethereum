@@ -55,7 +55,6 @@ public:
 	bool fulloutput = false;///< Replace large output to just it's length
 	bool createRandomTest = false; ///< Generate random test
 	bool jsontrace = false; ///< Vmtrace to stdout in json format
-	eth::StandardTrace::DebugOptions jsontraceOptions; ///< output config for jsontrace
 	std::string testpath;	///< Custom test folder path
 	Verbosity logVerbosity = Verbosity::NiceReport;
 
