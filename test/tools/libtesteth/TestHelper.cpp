@@ -379,7 +379,6 @@ string prepareVersionString()
 	string version = "cpp-" + string(ETH_PROJECT_VERSION);
 	version += "+commit." + commit.substr(0, 8);
 	version += "." + string(DEV_QUOTED(ETH_BUILD_OS)) + "." + string(DEV_QUOTED(ETH_BUILD_COMPILER));
-	version += "CRYPTOPP: " + CRYPTOPP_VERSION;
 	return version;
 }
 
