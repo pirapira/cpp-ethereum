@@ -2,8 +2,6 @@ include(ExternalProject)
 
 # HTTP server from JSON RPC CPP requires microhttpd library. It can find it itself,
 # but we need to know the MHD location for static linking.
-find_package(MHD REQUIRED)
-
 get_property(jsoncpp_include_dir TARGET jsoncpp_lib_static PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 get_property(jsoncpp_library TARGET jsoncpp_lib_static PROPERTY IMPORTED_LOCATION_RELEASE)
 
@@ -37,15 +35,12 @@ set(CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
                -DJSONCPP_INCLUDE_DIR=${jsoncpp_include_dir}
                # Select jsoncpp include prefix: <json/...> or <jsoncpp/json/...>
                -DJSONCPP_INCLUDE_PREFIX=json
-               -DJSONCPP_LIBRARY=${jsoncpp_library}
-               -DMHD_INCLUDE_DIR=${MHD_INCLUDE_DIR}
-               -DMHD_LIBRARY=${MHD_LIBRARY})
+               -DJSONCPP_LIBRARY=${jsoncpp_library})
 
 if (WIN32)
     # For Windows we have to provide also locations for debug libraries.
     set(CMAKE_ARGS ${CMAKE_ARGS}
-        -DJSONCPP_LIBRARY_DEBUG=${jsoncpp_library}
-        -DMHD_LIBRARY_DEBUG=${MHD_LIBRARY})
+        -DJSONCPP_LIBRARY_DEBUG=${jsoncpp_library})
 endif()
 
 ExternalProject_Add(
@@ -79,8 +74,6 @@ add_dependencies(JsonRpcCpp::Common jsonrpccpp)
 add_library(JsonRpcCpp::Server STATIC IMPORTED)
 set_property(TARGET JsonRpcCpp::Server PROPERTY IMPORTED_CONFIGURATIONS Release)
 set_property(TARGET JsonRpcCpp::Server PROPERTY IMPORTED_LOCATION_RELEASE ${JSONRPCCPP_SERVER_LIBRARY})
-set_property(TARGET JsonRpcCpp::Server PROPERTY INTERFACE_LINK_LIBRARIES JsonRpcCpp::Common ${MHD_LIBRARY})
-set_property(TARGET JsonRpcCpp::Server PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${MHD_INCLUDE_DIR})
 add_dependencies(JsonRpcCpp::Server jsonrpccpp)
 
 unset(BINARY_DIR)
