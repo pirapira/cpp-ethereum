@@ -100,8 +100,7 @@ Address dev::toAddress(Address const& _from, u256 const& _nonce)
 void dev::encrypt(Public const& _k, bytesConstRef _plain, bytes& o_cipher)
 {
 	bytes io = _plain.toBytes();
-	Secp256k1PP machine;
-	machine.encrypt(_k, io);
+	Secp256k1PP::get()->encrypt(_k, io);
 	o_cipher = std::move(io);
 }
 

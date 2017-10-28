@@ -58,6 +58,9 @@ public:
 	
 	/// Decrypts text (replace input). (ECIES w/AES128-CTR-SHA256)
 	bool decryptECIES(Secret const& _k, bytesConstRef _sharedMacData, bytes& io_text);
+
+private:
+	Secp256k1PP() = default;
 };
 
 }
