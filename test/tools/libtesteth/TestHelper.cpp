@@ -132,15 +132,6 @@ std::vector<eth::Network> const& getNetworks()
 	return networks;
 }
 
-std::string exportLog(eth::LogEntries const& _logs)
-{
-	RLPStream s;
-	s.appendList(_logs.size());
-	for (LogEntry const& l: _logs)
-		l.streamRLP(s);
-	return toHexPrefixed(sha3(s.out()));
-}
-
 u256 toInt(json_spirit::mValue const& _v)
 {
 	switch (_v.type())
@@ -297,26 +288,6 @@ bytes importCode(json_spirit::mObject const& _o)
 	return code;
 }
 
-LogEntries importLog(json_spirit::mArray const& _a)
-{
-	LogEntries logEntries;
-	for (auto const& l: _a)
-	{
-		json_spirit::mObject o = l.get_obj();
-		BOOST_REQUIRE(o.count("address") > 0);
-		BOOST_REQUIRE(o.count("topics") > 0);
-		BOOST_REQUIRE(o.count("data") > 0);
-		BOOST_REQUIRE(o.count("bloom") > 0);
-		LogEntry log;
-		log.address = Address(o.at("address").get_str());
-		for (auto const& t: o.at("topics").get_array())
-			log.topics.push_back(h256(t.get_str()));
-		log.data = importData(o);
-		logEntries.push_back(log);
-	}
-	return logEntries;
-}
-
 void checkOutput(bytesConstRef _output, json_spirit::mObject const& _o)
 {
 	int j = 0;
@@ -359,119 +330,6 @@ void checkStorage(map<u256, u256> const& _expectedStore, map<u256, u256> const& 
 	}
 }
 
-void checkCallCreates(eth::Transactions const& _resultCallCreates, eth::Transactions const& _expectedCallCreates)
-{
-	BOOST_REQUIRE_EQUAL(_resultCallCreates.size(), _expectedCallCreates.size());
-
-	for (size_t i = 0; i < _resultCallCreates.size(); ++i)
-	{
-		BOOST_CHECK(_resultCallCreates[i].data() == _expectedCallCreates[i].data());
-		BOOST_CHECK(_resultCallCreates[i].receiveAddress() == _expectedCallCreates[i].receiveAddress());
-		BOOST_CHECK(_resultCallCreates[i].gas() == _expectedCallCreates[i].gas());
-		BOOST_CHECK(_resultCallCreates[i].value() == _expectedCallCreates[i].value());
-	}
-}
-
-string prepareVersionString()
-{
-	//cpp-1.3.0+commit.6be76b64.Linux.g++
-	string commit(DEV_QUOTED(ETH_COMMIT_HASH));
-	string version = "cpp-" + string(ETH_PROJECT_VERSION);
-	version += "+commit." + commit.substr(0, 8);
-	version += "." + string(DEV_QUOTED(ETH_BUILD_OS)) + "." + string(DEV_QUOTED(ETH_BUILD_COMPILER));
-	return version;
-}
-
-string prepareLLLCVersionString()
-{
-	string result = test::executeCmd("lllc --version");
-	string::size_type pos = result.rfind("Version");
-	if (pos != string::npos)
-		return result.substr(pos, result.length());
-	return "Error getting LLLC Version";
-}
-
-void copyFile(fs::path const& _source, fs::path const& _destination)
-{
-	fs::ifstream src(_source, std::ios::binary);
-	fs::ofstream dst(_destination, std::ios::binary);
-	dst << src.rdbuf();
-}
-
-RLPStream createRLPStreamFromTransactionFields(json_spirit::mObject const& _tObj)
-{
-	//Construct Rlp of the given transaction
-	RLPStream rlpStream;
-	rlpStream.appendList(_tObj.size());
-
-	if (_tObj.count("nonce"))
-		rlpStream << bigint(_tObj.at("nonce").get_str());
-
-	if (_tObj.count("gasPrice"))
-		rlpStream << bigint(_tObj.at("gasPrice").get_str());
-
-	if (_tObj.count("gasLimit"))
-		rlpStream << bigint(_tObj.at("gasLimit").get_str());
-
-	if (_tObj.count("to"))
-	{
-		if (_tObj.at("to").get_str().empty())
-			rlpStream << "";
-		else
-			rlpStream << importByteArray(_tObj.at("to").get_str());
-	}
-
-	if (_tObj.count("value"))
-		rlpStream << bigint(_tObj.at("value").get_str());
-
-	if (_tObj.count("data"))
-		rlpStream << importData(_tObj);
-
-	if (_tObj.count("v"))
-		rlpStream << bigint(_tObj.at("v").get_str());
-
-	if (_tObj.count("r"))
-		rlpStream << bigint(_tObj.at("r").get_str());
-
-	if (_tObj.count("s"))
-		rlpStream <<  bigint(_tObj.at("s").get_str());
-
-	if (_tObj.count("extrafield"))
-		rlpStream << bigint(_tObj.at("extrafield").get_str());
-
-	return rlpStream;
-}
-
-
-dev::eth::BlockHeader constructHeader(
-	h256 const& _parentHash,
-	h256 const& _sha3Uncles,
-	Address const& _author,
-	h256 const& _stateRoot,
-	h256 const& _transactionsRoot,
-	h256 const& _receiptsRoot,
-	dev::eth::LogBloom const& _logBloom,
-	u256 const& _difficulty,
-	u256 const& _number,
-	u256 const& _gasLimit,
-	u256 const& _gasUsed,
-	u256 const& _timestamp,
-	bytes const& _extraData)
-{
-	RLPStream rlpStream;
-	rlpStream.appendList(15);
-
-	rlpStream << _parentHash << _sha3Uncles << _author << _stateRoot << _transactionsRoot << _receiptsRoot << _logBloom
-		<< _difficulty << _number << _gasLimit << _gasUsed << _timestamp << _extraData << h256{} << eth::Nonce{};
-
-	return BlockHeader(rlpStream.out(), HeaderData);
-}
-
-void updateEthashSeal(dev::eth::BlockHeader& _header, h256 const& _mixHash, h64 const& _nonce)
-{
-	Ethash::setNonce(_header, _nonce);
-	Ethash::setMixHash(_header, _mixHash);
-}
 
 namespace
 {

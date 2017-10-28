@@ -60,20 +60,6 @@ int dev::test::randomNumber()
 	return std::uniform_int_distribution<int>(1)(randomGenerator);
 }
 
-Json::Value dev::test::loadJsonFromFile(fs::path const& _path)
-{
-	Json::Reader reader;
-	Json::Value result;
-	string s = dev::contentsString(_path);
-	if (!s.length())
-		ctest << "Contents of " << _path.string() << " is empty. Have you cloned the 'tests' repo branch develop and set ETHEREUM_TEST_PATH to its path?";
-	else
-		ctest << "FIXTURE: loaded test from file: " << _path.string();
-
-	reader.parse(s, result);
-	return result;
-}
-
 fs::path dev::test::toTestFilePath(std::string const& _filename)
 {
 	return getTestPath() / fs::path(_filename + ".json");

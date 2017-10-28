@@ -27,7 +27,6 @@
 using namespace std;
 using namespace dev;
 using namespace dev::test;
-using namespace dev::eth;
 using namespace boost;
 
 void TestOutputHelper::initTest(size_t _maxTests)

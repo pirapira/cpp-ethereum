@@ -46,8 +46,6 @@ class Client;
 
 void mine(Client& c, int numBlocks);
 void connectClients(Client& c1, Client& c2);
-void mine(Block& _s, BlockChain const& _bc, SealEngineFace* _sealer);
-void mine(BlockHeader& _bi, SealEngineFace* _sealer, bool _verify = true);
 }
 
 namespace test
@@ -75,28 +73,9 @@ bytes importData(json_spirit::mObject const& _o);
 bytes importByteArray(std::string const& _str);
 void checkHexHasEvenLength(std::string const&);
 void copyFile(boost::filesystem::path const& _source, boost::filesystem::path const& _destination);
-eth::LogEntries importLog(json_spirit::mArray const& _o);
-std::string exportLog(eth::LogEntries const& _logs);
 void checkOutput(bytesConstRef _output, json_spirit::mObject const& _o);
 void checkStorage(std::map<u256, u256> _expectedStore, std::map<u256, u256> _resultStore, Address _expectedAddr);
-void checkCallCreates(eth::Transactions const& _resultCallCreates, eth::Transactions const& _expectedCallCreates);
-dev::eth::BlockHeader constructHeader(
-	h256 const& _parentHash,
-	h256 const& _sha3Uncles,
-	Address const& _author,
-	h256 const& _stateRoot,
-	h256 const& _transactionsRoot,
-	h256 const& _receiptsRoot,
-	dev::eth::LogBloom const& _logBloom,
-	u256 const& _difficulty,
-	u256 const& _number,
-	u256 const& _gasLimit,
-	u256 const& _gasUsed,
-	u256 const& _timestamp,
-	bytes const& _extraData);
-void updateEthashSeal(dev::eth::BlockHeader& _header, h256 const& _mixHash, dev::eth::Nonce const& _nonce);
 RLPStream createRLPStreamFromTransactionFields(json_spirit::mObject const& _tObj);
-json_spirit::mObject fillJsonWithTransaction(eth::Transaction const& _txn);
 
 //Fill Test Functions
 bool createRandomTest();	//returns true if succeed, false if there was an error;

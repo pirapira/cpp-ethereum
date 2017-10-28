@@ -101,18 +101,10 @@ include(EthUtils)
 hunter_add_package(Boost COMPONENTS filesystem system thread)
 find_package(Boost CONFIG REQUIRED filesystem system thread)
 
-hunter_add_package(jsoncpp)
-find_package(jsoncpp CONFIG REQUIRED)
-
-hunter_add_package(Snappy)
-find_package(Snappy CONFIG REQUIRED)
-
 hunter_add_package(cryptopp)
 find_package(cryptopp CONFIG REQUIRED)
 
-include(ProjectJsonRpcCpp)
 include(ProjectSecp256k1)
-include(ProjectLibFF)
 
 find_package(Threads)
 
@@ -124,18 +116,13 @@ configure_project()
 
 add_subdirectory(libdevcore)
 add_subdirectory(libdevcrypto)
-add_subdirectory(libp2p)
 
 add_subdirectory(libethash)
 
 add_subdirectory(libethcore)
 add_subdirectory(libevm)
-add_subdirectory(libethereum)
-add_subdirectory(libethashseal)
 
 add_subdirectory(libwhisper)
-add_subdirectory(libwebthree)
-add_subdirectory(libweb3jsonrpc)
 
 if (EVMJIT)
     add_subdirectory(evmjit)

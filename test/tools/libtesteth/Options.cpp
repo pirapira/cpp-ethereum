@@ -64,11 +64,6 @@ void printHelp()
 	cout << setw(30) << "--version" << setw(25) << "Display build information\n";
 }
 
-void printVersion()
-{
-	cout << prepareVersionString() << "\n";
-}
-
 Options::Options(int argc, char** argv)
 {
 	trDataIndex = -1;
@@ -102,7 +97,6 @@ Options::Options(int argc, char** argv)
 		}
 		else if (arg == "--version" || arg == "--custom-version")
 		{
-			printVersion();
 			exit(0);
 		}
 		else if (arg == "--vmtrace")
