@@ -142,7 +142,7 @@ void Client::init(p2p::Host* _extNet, fs::path const& _dbPath, fs::path const& _
 
     if (_dbPath.size())
         Defaults::setDBPath(_dbPath);
-    doWork(false);
+    doWork(std::unique_lock<std::mutex>());
 }
 
 ImportResult Client::queueBlock(bytes const& _block, bool _isSafe)
@@ -663,7 +663,7 @@ void Client::noteChanged(h256Hash const& _filters)
         i.second.clear();
 }
 
-void Client::doWork(bool _doWait)
+void Client::doWork(std::unique_lock<std::mutex> _waitLock)
 {
     bool t = true;
     if (m_syncBlockQueue.compare_exchange_strong(t, false))
@@ -679,6 +679,10 @@ void Client::doWork(bool _doWait)
     bool isSealed = false;
     DEV_READ_GUARDED(x_working)
         isSealed = m_working.isSealed();
+
+    if (isSealed && !_waitLock)
+        _waitLock = std::unique_lock<std::mutex>(x_signalled);
+
     if (!isSealed && !isMajorSyncing() && !m_remoteWorking && m_syncTransactionQueue.compare_exchange_strong(t, false))
         syncTransactionQueue();
 
@@ -692,11 +696,8 @@ void Client::doWork(bool _doWait)
         isSealed = m_working.isSealed();
     // If the block is sealed, we have to wait for it to tickle through the block queue
     // (which only signals as wanting to be synced if it is ready).
-    if (!m_syncBlockQueue && !m_syncTransactionQueue && (_doWait || isSealed))
-    {
-        std::unique_lock<std::mutex> l(x_signalled);
-        m_signalled.wait_for(l, chrono::seconds(1));
-    }
+    if (!m_syncBlockQueue && !m_syncTransactionQueue && _waitLock)
+        m_signalled.wait(_waitLock);
 }
 
 void Client::tick()

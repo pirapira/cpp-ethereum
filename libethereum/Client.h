@@ -249,8 +249,9 @@ protected:
     void startedWorking() override;
 
     /// Do some work. Handles blockchain maintenance and sealing.
-    void doWork(bool _doWait);
-    void doWork() override { doWork(true); }
+    /// If _waitLock has an associated lock, wait for m_signalled.
+    void doWork(std::unique_lock<std::mutex> _waitLock);
+    void doWork() override { doWork(std::unique_lock<std::mutex>()); }
 
     /// Called when Worker is exiting.
     void doneWorking() override;
@@ -281,10 +282,10 @@ protected:
     void syncTransactionQueue();
 
     /// Magically called when m_tq needs syncing. Be nice and don't block.
-    void onTransactionQueueReady() { m_syncTransactionQueue = true; m_signalled.notify_all(); }
+    void onTransactionQueueReady() { m_syncTransactionQueue = true; Guard g(x_signalled); m_signalled.notify_all(); }
 
     /// Magically called when m_bq needs syncing. Be nice and don't block.
-    void onBlockQueueReady() { m_syncBlockQueue = true; m_signalled.notify_all(); }
+    void onBlockQueueReady() { m_syncBlockQueue = true; Guard g(x_signalled); m_signalled.notify_all(); }
 
     /// Called when the post state has changed (i.e. when more transactions are in it or we're sealing on a new block).
     /// This updates m_sealingInfo.
