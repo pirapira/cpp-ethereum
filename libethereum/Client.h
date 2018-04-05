@@ -249,9 +249,7 @@ protected:
     void startedWorking() override;
 
     /// Do some work. Handles blockchain maintenance and sealing.
-    /// If _waitLock has an associated lock, wait for m_signalled.
-    void doWork(std::unique_lock<std::mutex> _waitLock);
-    void doWork() override { doWork(std::unique_lock<std::mutex>()); }
+    void doWork();
 
     /// Called when Worker is exiting.
     void doneWorking() override;
