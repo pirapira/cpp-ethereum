@@ -64,7 +64,7 @@ Client::Client(ChainParams const& _params, int _networkID, p2p::Host* _host,
     std::shared_ptr<GasPricer> _gpForAdoption, fs::path const& _dbPath,
     fs::path const& _snapshotPath, WithExisting _forceAction, TransactionQueue::Limits const& _l)
   : ClientBase(),
-    Worker("eth", 0),
+    Worker("eth"),
     m_bc(_params, _dbPath, _forceAction,
         [](unsigned d, unsigned t) {
             std::cerr << "REVISING BLOCKCHAIN: Processed " << d << " of " << t << "...\r";
