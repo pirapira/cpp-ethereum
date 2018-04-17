@@ -138,7 +138,7 @@ void VM::caseCreate()
     u256 balance = fromEvmC(rawBalance);
     if (balance >= endowment && m_message->depth < 1024)
     {
-        evmc_message msg = {};
+        evmc_message msg;
         msg.gas = m_io_gas;
         if (m_rev >= EVMC_TANGERINE_WHISTLE)
             msg.gas -= msg.gas / 64;
@@ -177,7 +177,7 @@ void VM::caseCall()
 {
     m_bounce = &VM::interpretCases;
 
-    evmc_message msg = {};
+    evmc_message msg;
 
     // Clear the return data buffer. This will not free the memory.
     m_returnData.clear();

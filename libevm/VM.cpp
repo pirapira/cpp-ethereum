@@ -39,7 +39,7 @@ evmc_result execute(evmc_instance* _instance, evmc_context* _context, evmc_revis
     const evmc_message* _msg, uint8_t const* _code, size_t _codeSize) noexcept
 {
     auto vm = static_cast<dev::eth::VM*>(_instance);
-    evmc_result result = {};
+    evmc_result result;
     dev::eth::owning_bytes_ref output;
 
     try
